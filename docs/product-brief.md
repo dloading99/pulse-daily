@@ -64,3 +64,307 @@ Daily Pulse è un assistente editoriale AI-driven che trasforma la routine Linke
 - Integrazioni con fonti via API/sistemi conformi ai termini d'uso.
 - Isolamento dati per account; gestione sicura di credenziali LinkedIn (OAuth).
 - Architettura scalabile per multi-utente e future estensioni di fonti/social.
+
+### 7. Scope MVP – Cosa deve esserci in v1 (e cosa no)
+
+#### 7.1 Must-have (MVP v1.0)
+
+Queste funzionalità devono essere presenti nella prima versione funzionante:
+
+1. **Onboarding base**
+
+   * Raccolta: settore, ruolo, lingua principale, obiettivo (es. awareness/lead/autorevolezza).
+   * Configurazione calendario editoriale con:
+
+     * preset settimanale,
+     * possibilità di rinominare i temi,
+     * drag & drop per spostare temi tra i giorni.
+   * Collegamento LinkedIn via OAuth (solo profilo personale).
+
+2. **Insight Deck minimo**
+
+   * Per il tema del giorno:
+
+     * Ricerca articoli su almeno **2 fonti** tra: Bloomberg, HBR, MIT Tech Review, The Economist.
+     * Output di **minimo 3 card insight** con:
+
+       * titolo,
+       * fonte + data,
+       * 3–5 bullet di sintesi,
+       * link all’articolo.
+     * Pulse Score semplificato (scala 1–100) basato su:
+
+       * allineamento al tema del giorno,
+       * recency,
+       * profondità percepita (valutata dal modello).
+
+3. **Generazione bozza post**
+
+   * L’utente seleziona 1–3 insight.
+   * Viene generata **1 bozza principale** con struttura vincolata:
+
+     * Prima parte: HOOK (max 2 frasi).
+     * Corpo: INSIGHT (3–6 frasi o bullet).
+     * Sezione centrale: HUMAN CONNECTION (1–2 frasi).
+     * Chiusura: OPEN LOOP (1 domanda o call to discussion).
+   * Editor di testo integrato con:
+
+     * conteggio caratteri,
+     * possibilità di rigenerare mantenendo stessi insight.
+
+4. **Generazione immagine**
+
+   * Generazione di **1 immagine** per post con:
+
+     * stile illustrato (no fotorealistico),
+     * formati: 1200x1200.
+   * Azioni utente:
+
+     * rigenera immagine,
+     * sostituisci con upload propria.
+
+5. **Pubblicazione base su LinkedIn**
+
+   * “Pubblica ora” sul profilo personale.
+   * Anteprima fedele del post (testo + immagine).
+   * Conferma esplicita prima dell’invio.
+
+6. **Persistenza minima**
+
+   * Salvataggio:
+
+     * calendario temi,
+     * draft post non pubblicati,
+     * storico dei post pubblicati (solo metadata + link).
+
+#### 7.2 Should-have (se rientra in tempi)
+
+* Scheduling “Programma” con:
+
+  * scelta data/ora,
+  * orario consigliato molto semplice (fascia oraria basata su best practice standard).
+* Analytics base:
+
+  * raccolta e visualizzazione:
+
+    * impression (se disponibili),
+    * like,
+    * commenti,
+    * share.
+* Voice Match semplificato:
+
+  * analisi di 5–10 post recenti per estrarre:
+
+    * lunghezza media,
+    * uso di paragrafi brevi/lunghi,
+    * prevalenza di storytelling vs bullet.
+
+#### 7.3 Could-have (da esplicitare come Fase 2+)
+
+* Ottimizzazione avanzata orari di pubblicazione in base a storico reale.
+* Modello Pulse Score evoluto.
+* Supporto pagine aziendali LinkedIn.
+* Formati immagine aggiuntivi (1200x1350).
+
+---
+
+### 8. Modello dati – Oggetti chiave
+
+Definire chiaramente almeno queste entità (nomi indicativi, implementazione a discrezione tecnica, ma concetti obbligatori):
+
+1. **User**
+
+   * id
+   * nome, email
+   * settore
+   * ruolo
+   * lingua principale
+   * obiettivo (enum: awareness / lead / autorevolezza)
+   * impostazioni palette brand (opzionale v1)
+   * collegamento LinkedIn (token / metadata)
+
+2. **Topic (Tema editoriale)**
+
+   * id
+   * user_id
+   * nome (es. “Innovazione tecnologica”)
+   * descrizione breve
+   * giorno della settimana (0–6)
+   * attivo (bool)
+
+3. **Insight**
+
+   * id
+   * user_id
+   * topic_id (opzionale, se legato al tema)
+   * fonte (enum: Bloomberg / HBR / MIT / Economist / altro futuro)
+   * titolo
+   * url
+   * data_pubblicazione
+   * sintesi_bullet[] (lista stringhe)
+   * pulse_score (1–100)
+   * tags o parole chiave
+
+4. **PostDraft**
+
+   * id
+   * user_id
+   * data_creazione
+   * topic_id
+   * insight_ids[] (lista di id Insight selezionati)
+   * testo_generato (versione AI)
+   * testo_modificato (versione finale se editata)
+   * stato (enum: draft / pronto / pubblicato / programmato)
+   * scheduled_at (se programmato)
+
+5. **ImageAsset**
+
+   * id
+   * user_id
+   * post_draft_id
+   * url (storage)
+   * tipo (enum: generata / upload utente)
+   * formato (1200x1200 ecc.)
+
+6. **AnalyticsSnapshot**
+
+   * id
+   * user_id
+   * post_draft_id
+   * linkedin_post_id
+   * impression
+   * like
+   * commenti
+   * share
+   * data_rilevazione
+
+---
+
+### 9. Regole dure per la generazione AI
+
+Queste sono **non negoziabili**. Se non rispettate, il modello va ritarato.
+
+#### 9.1 Struttura del post
+
+Ogni generazione deve rispettare:
+
+* HOOK:
+
+  * massimo 2 frasi,
+  * evitare frasi tipo “In questo post parlerò di…”.
+* INSIGHT:
+
+  * contenuto ancorato almeno a 1 insight selezionato,
+  * vietata ripetizione letterale dei bullet, deve essere parafrasi analitica.
+* HUMAN CONNECTION:
+
+  * sempre presente,
+  * usa 1–2 frasi che simulino esperienza/prospettiva personale plausibile per un professionista nel ruolo specificato.
+* OPEN LOOP:
+
+  * deve SEMPRE essere una domanda o invito alla conversazione,
+  * no call-to-action di vendita in v1.
+
+#### 9.2 Lunghezza target
+
+* Target caratteri: 700–1.400 caratteri (spazio LinkedIn-friendly).
+* Il modello deve avere vincolo di brevità:
+
+  * se supera X caratteri (es. 1.600), l’output va rigenerato o tronca in maniera intelligente.
+
+#### 9.3 Tono di voce
+
+* Banditi:
+
+  * toni eccessivamente formali tipo “Gentili colleghi,”
+  * slang fuori contesto,
+  * emoji spam.
+* Consentiti con moderazione:
+
+  * 0–2 emoji per post, se coerenti.
+* Tono obbligatorio:
+
+  * assertivo, ma non aggressivo,
+  * tecnico, ma comprensibile per un professionista informato.
+
+#### 9.4 Safe-guard minimi
+
+* Vietato:
+
+  * generare contenuti discriminatori, sensibili o politicamente esplosivi fuori contesto professionale.
+* Se l’utente chiede temi borderline, il sistema deve:
+
+  * rispondere con un messaggio di errore contestuale o generare un post neutro/educativo.
+
+---
+
+### 10. Gestione errori e stati vuoti
+
+Dove saltano fuori bug e frustrazione se non definiti.
+
+1. **Nessun articolo trovato**
+
+   * Comportamento:
+
+     * mostra messaggio: “Per il tema di oggi non ci sono articoli rilevanti nel periodo selezionato.”
+     * opzioni:
+
+       * “Allarga la finestra temporale”
+       * “Cambia tema”
+       * “Genera comunque un post partendo dal tema, senza articoli”
+
+2. **Errore LinkedIn OAuth**
+
+   * Comportamento:
+
+     * notificare in modo chiaro che la pubblicazione diretta non è disponibile,
+     * permettere comunque di:
+
+       * generare testo,
+       * generare immagine,
+       * esportare/copiare il contenuto.
+
+3. **Generazione immagine fallita**
+
+   * Fino a 3 tentativi automatici dietro le quinte.
+   * Se fallisce:
+
+     * mostra stato vuoto con placeholder,
+     * opzioni:
+
+       * “Riprova”
+       * “Carica immagine manuale”
+       * “Prosegui senza immagine”
+
+4. **Timeout generazione testo**
+
+   * Se superata una soglia (es. 15 secondi):
+
+     * mostra messaggio: “La generazione sta richiedendo più del previsto.”
+     * opzioni:
+
+       * “Riprova”
+       * “Riduci la lunghezza target e riprova”
+
+---
+
+### 11. KPI di successo v1
+
+Per evitare il solito “funziona, quindi è ok”, fissare metriche base:
+
+1. **Time-to-first-post**
+
+   * Utente nuovo:
+
+     * obiettivo: completare onboarding + generare + pubblicare 1 post in ≤ 15 minuti.
+
+2. **Tempo medio generazione post giornaliero**
+
+   * Utente abituale:
+
+     * obiettivo: ≤ 5 minuti dal momento in cui apre l’app a “Pubblica ora”.
+
+3. **Stabilità**
+
+   * Tasso di fallimento generazioni (testo/immagine) < 2% sulle richieste totali.
+

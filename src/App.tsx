@@ -10,6 +10,22 @@ import { OnboardingCard } from './components/OnboardingCard';
 import { HeroHeader } from './components/HeroHeader';
 import { LoaderCircle } from 'lucide-react';
 
+const ensureBullets = (rawBullets: string[], draft: InsightDraft) => {
+  const cleaned = rawBullets.map((b) => b.trim()).filter(Boolean);
+  if (cleaned.length >= 3) return cleaned;
+
+  const sentences = draft.rawText.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter(Boolean);
+  const fallbackPool = sentences.length > 0 ? sentences : [draft.title];
+  const targetCount = Math.max(3, cleaned.length);
+
+  while (cleaned.length < targetCount) {
+    const next = fallbackPool[cleaned.length % fallbackPool.length];
+    cleaned.push(next.length > 110 ? `${next.slice(0, 107)}...` : next);
+  }
+
+  return cleaned;
+};
+
 function App() {
   const { user, calendar, selectedDayId, setInsightsForDay } = useAppStore();
   const [loadingInsights, setLoadingInsights] = useState(false);
@@ -24,6 +40,8 @@ function App() {
 
   useEffect(() => {
     if (!user) return;
+    const cachedInsights = useAppStore.getState().insights[selectedDay.id];
+    if (cachedInsights && cachedInsights.length > 0) return;
 
     let cancelled = false;
     async function load() {
@@ -33,8 +51,19 @@ function App() {
         const drafts: InsightDraft[] = await insightService.fetchInsightsByTopic(user.id, selectedDay.topicId);
         const enriched: Insight[] = await Promise.all(
           drafts.map(async (draft) => {
-            const llm = await llmClient.generateInsightSummaryAndScore({ ...draft, topicTitle });
-            return { ...draft, bullets: llm.bullets, pulseScore: llm.pulseScore, generatedBy: llm.provider };
+            const llm = await llmClient.generateInsightSummaryAndScore({
+              title: draft.title,
+              rawText: draft.rawText,
+              source: draft.source,
+              publicationDate: draft.publicationDate,
+              topicTitle,
+            });
+            return {
+              ...draft,
+              bullets: ensureBullets(llm.bullets, draft),
+              pulseScore: Math.min(100, Math.max(1, llm.pulseScore)),
+              generatedBy: llm.provider,
+            };
           })
         );
         if (!cancelled) {

@@ -22,6 +22,8 @@ export function HeroHeader({ user, topicTitle }: Props) {
           <span className="badge">{user.name}</span>
           <span className="badge">{user.role}</span>
           <span className="badge">{user.sector}</span>
+          <span className="badge">Lingua: {user.language}</span>
+          <span className="badge">Obiettivo: {user.objective}</span>
           {topicTitle && <span className="badge">Tema del giorno: {topicTitle}</span>}
         </div>
       )}

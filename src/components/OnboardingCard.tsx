@@ -1,7 +1,17 @@
 import { useState } from 'react';
 import { useAppStore } from '../state/useAppStore';
+import { Objective } from '../types';
 
 const sectorOptions = ['Tech B2B', 'Finanza', 'Energy', 'Consulenza', 'Healthcare'];
+const languageOptions = [
+  { value: 'it', label: 'Italiano' },
+  { value: 'en', label: 'English' },
+];
+const objectiveOptions: { value: Objective; label: string }[] = [
+  { value: 'awareness', label: 'Awareness' },
+  { value: 'lead', label: 'Lead generation' },
+  { value: 'autorevolezza', label: 'Autorevolezza' },
+];
 
 export function OnboardingCard() {
   const setUser = useAppStore((s) => s.setUser);
@@ -9,6 +19,8 @@ export function OnboardingCard() {
   const [role, setRole] = useState('Founder / CEO');
   const [sector, setSector] = useState(sectorOptions[0]);
   const [focusTopics, setFocusTopics] = useState<string[]>(['AI governance e policy']);
+  const [language, setLanguage] = useState('it');
+  const [objective, setObjective] = useState<Objective>('awareness');
 
   const toggleTopic = (topic: string) => {
     setFocusTopics((curr) =>
@@ -27,6 +39,8 @@ export function OnboardingCard() {
       role,
       sector,
       focusTopics,
+      language,
+      objective,
     });
   };
 
@@ -71,7 +85,23 @@ export function OnboardingCard() {
               ))}
             </select>
           </label>
-          <div className="flex flex-col gap-2 text-sm">
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-slate-600 font-medium">Lingua principale</span>
+            <select
+              className="rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-mint"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+            >
+              {languageOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="flex flex-col gap-1 text-sm">
             <span className="text-slate-600 font-medium">Focus tematici</span>
             <div className="flex flex-wrap gap-2">
               {[
@@ -94,7 +124,21 @@ export function OnboardingCard() {
                 </button>
               ))}
             </div>
-          </div>
+          </label>
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="text-slate-600 font-medium">Obiettivo</span>
+            <select
+              className="rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-mint"
+              value={objective}
+              onChange={(e) => setObjective(e.target.value as Objective)}
+            >
+              {objectiveOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         <div className="flex justify-end">
           <button type="submit" className="btn-primary" disabled={!canSubmit}>

@@ -1,11 +1,15 @@
 export type Source = 'Bloomberg' | 'Harvard Business Review' | 'MIT Technology Review' | 'The Economist';
 
+export type Objective = 'awareness' | 'lead' | 'autorevolezza';
+
 export interface UserProfile {
   id: string;
   name: string;
   role: string;
   sector: string;
   focusTopics: string[];
+  language: string;
+  objective: Objective;
 }
 
 export interface Topic {

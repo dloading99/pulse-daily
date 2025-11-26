@@ -1,18 +1,34 @@
 # Daily Pulse
 
-Daily Pulse è un assistente editoriale AI-driven per professionisti che vogliono pubblicare su LinkedIn in pochi minuti mantenendo qualità e controllo umano. L'app orchestra ricerca, generazione di testo e immagine, e pubblicazione programmata con un ciclo di apprendimento continuo.
+Daily Pulse è un assistente editoriale AI-driven per professionisti che vogliono pubblicare su LinkedIn in pochi minuti mantenendo qualità e controllo umano. Questa iterazione introduce il prototipo **Slice 1 – Research → Insight** mobile-first basato su React + TypeScript + Tailwind.
 
-## Moduli principali
-- **Calendario editoriale intelligente**: definisce e riutilizza i temi settimanali con drag & drop e suggerimenti adattivi.
-- **Ricerca & Insight**: seleziona 3–5 insight di qualità da fonti autorevoli (Bloomberg, HBR, MIT Tech Review, The Economist) filtrati per settore e recency.
-- **Generazione testi (Ghostwriter AI)**: crea bozze LinkedIn con struttura HOOK → INSIGHT → HUMAN CONNECTION → OPEN LOOP e tono calibrato sull'utente tramite Voice Match.
-- **Generazione immagini**: propone immagini editoriali coerenti con la palette del brand e rigenerabili.
-- **Pubblicazione & scheduling**: consente pubblicazione o programmazione su LinkedIn con anteprima fedele e controllo esplicito.
-- **Personalizzazione & learning (Pulse Engine)**: apprende da engagement, temi usati e orari efficaci per migliorare suggerimenti.
+## Come eseguire
 
-## Documentazione
-- `docs/product-brief.md`: visione, target, flusso end-to-end e requisiti dettagliati per tutti i moduli.
-- `docs/experience-blueprint.md`: flussi UX mobile-first, schermate chiave e linee guida visive.
+```bash
+npm install
+npm run dev
+```
 
-## Stato del repository
-Il codice applicativo non è ancora presente. Questa repo contiene il brief di prodotto e la progettazione iniziale per guidare la prossima fase di sviluppo.
+Per build di produzione:
+
+```bash
+npm run build
+```
+
+## Variabili ambiente per LLM
+
+Il deck degli insight usa un wrapper `llmClient` che richiama OpenAI se disponibile:
+
+- `VITE_OPENAI_API_KEY`: chiave API.
+- `VITE_OPENAI_MODEL` (opzionale): default `gpt-4o-mini`.
+
+Se la chiave non è valorizzata, l’app usa un fallback locale per generare bullet e Pulse Score solo a scopo demo.
+
+## Cosa include lo Slice 1
+
+- Onboarding rapido con persistenza su `localStorage`.
+- Calendario editoriale settimanale con card drag & drop (HTML5) per riordinare i temi.
+- Insight Deck per il tema selezionato, alimentato da mock realistici (fonti: Bloomberg, HBR, MIT Tech Review, The Economist).
+- Sintesi bullet + Pulse Score generati via wrapper LLM pronto per sostituire i mock con API reali.
+
+Per dettagli di visione e UX consultare `docs/product-brief.md` e `docs/experience-blueprint.md`.

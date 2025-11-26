@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #f8fafc;
+}
+
+body {
+  margin: 0;
+}
+
+.card {
+  @apply bg-white border border-slate-200 rounded-2xl shadow-sm;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-full bg-night px-4 py-2 text-white font-semibold transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-mint focus:ring-offset-2;
+}
+
+.badge {
+  @apply inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-night;
+}

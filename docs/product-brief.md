@@ -706,7 +706,7 @@ Ogni generazione deve avere:
 
 * Tasso di fallimento generazioni (testo/immagine) **< 2%** delle richieste totali.
 
----
+* Utente nuovo:
 
 ## 12. Gerarchia di riferimento
 

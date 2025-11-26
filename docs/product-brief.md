@@ -8,6 +8,9 @@ Daily Pulse è un assistente editoriale AI-driven che trasforma la routine Linke
 
 Obiettivo: consentire a founder, executive e creator di pubblicare contenuti autorevoli in pochi minuti, mantenendo **controllo umano totale** su testo, immagine e pubblicazione.
 
+**Piattaforma v1.0**
+La versione v1.0 di Daily Pulse è una **web app responsive**, ottimizzata per l’utilizzo **mobile da browser** (mobile-first). Non sono previste app native (iOS/Android) per questa prima versione.
+
 ---
 
 ## 2. Target e casi d'uso
@@ -703,7 +706,7 @@ Ogni generazione deve avere:
 
 * Tasso di fallimento generazioni (testo/immagine) **< 2%** delle richieste totali.
 
----
+* Utente nuovo:
 
 ## 12. Gerarchia di riferimento
 
@@ -712,6 +715,32 @@ In caso di conflitto tra sezioni o dubbi interpretativi:
 1. La sezione **7. Scope MVP** definisce cosa va implementato in **v1.0**.
 2. Le sezioni **8–11** definiscono **come** il sistema deve comportarsi (regole, dati, errori, KPI).
 3. Le sezioni **1–6 / 6.bis** rappresentano la **visione completa di prodotto** e guidano le evoluzioni successive, ma non prevalgono sulle specifiche MVP.
+
+## 13. Priorità di sviluppo – Vertical slices v1
+
+Lo sviluppo di v1.0 deve seguire una logica di **vertical slices**: ogni step produce un flusso utilizzabile end-to-end, anche se parziale.
+
+**Slice 1 – Base prodotto (Research → Insight)**
+
+* Implementazione onboarding base (raccolta dati utente + calendario temi con preset).
+* Integrazione con almeno 2 fonti (Bloomberg / HBR / MIT / Economist).
+* Generazione dell’Insight Deck (3–5 card con titolo, fonte/data, bullet, link, Pulse Score semplificato).
+* Persistenza di user, topic, insight.
+
+**Slice 2 – Insight → Bozza testo (Ghostwriter)**
+
+* Flusso completo: selezione 1–3 insight → generazione bozza conforme alle regole del §4.3 e §9.
+* Editor integrato con conteggio caratteri e possibilità di rigenerare la bozza mantenendo gli stessi insight.
+* Salvataggio dei draft (PostDraft) secondo il modello dati del §8.
+
+**Slice 3 – Testo → Immagine → Pubblica ora**
+
+* Generazione di 1 immagine illustrata 1200x1200 per post (con opzioni rigenera / upload manuale).
+* Anteprima fedele del post (testo + immagine).
+* Integrazione LinkedIn OAuth (profilo personale) e funzionalità **“Pubblica ora”** con conferma esplicita.
+* Salvataggio metadata del post pubblicato (link, timestamp, linkedin_post_id).
+
+Ogni slice deve essere rilasciabile e testabile in autonomia, senza dipendere dal completamento delle funzionalità classificate come **Should-have** o **Could-have**.
 
 ---
 
